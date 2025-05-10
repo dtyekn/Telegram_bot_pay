@@ -1,0 +1,50 @@
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+
+# استبدل هذا بالتوكن الخاص بك من BotFather
+TOKEN = "7664215490:AAHAz5hljrOIhl0rnmwOwIO70-t_y1bYqbI"
+
+def start(update: Update, context: CallbackContext) -> None:
+    """يرسل رسالة ترحيبية عندما يتم استخدام الأمر /start"""
+    user = update.effective_user
+    update.message.reply_text(f"مرحباً {user.first_name}! أنا بوت تليجرام البسيط.\n"
+                             "يمكنك التحدث معي مباشرة أو استخدام الأمر /help لمعرفة المزيد.")
+
+def help_command(update: Update, context: CallbackContext) -> None:
+    """يرسل رسالة المساعدة عندما يتم استخدام الأمر /help"""
+    update.message.reply_text("""
+الأوامر المتاحة:
+/start - بدء المحادثة مع البوت
+/help - عرض رسالة المساعدة
+
+يمكنك أيضاً إرسال أي رسالة وسأرد عليك!
+""")
+
+def echo(update: Update, context: CallbackContext) -> None:
+    """يكرر الرسالة التي يرسلها المستخدم"""
+    user_message = update.message.text
+    update.message.reply_text(f"لقد قلت: {user_message}")
+
+def main():
+    """يبدأ تشغيل البوت"""
+    # إنشاء Updater وتمرير توكن البوت
+    updater = Updater(TOKEN)
+
+    # الحصول على dispatcher لتسجيل المعالجين
+    dispatcher = updater.dispatcher
+
+    # تسجيل المعالجين للأوامر
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("help", help_command))
+
+    # معالج للرسائل العادية (غير الأوامر)
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+
+    # بدأ البوت
+    updater.start_polling()
+
+    # تشغيل البوت حتى يتم الضغط على Ctrl-C
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
